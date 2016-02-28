@@ -123,6 +123,7 @@
 
 	$board = new Board(15);
 	$board->placeStone(0,0,"player");
+	$echo "YEAHHHH";
 	// echo $board->at(16,16)->hasStone();
 	// echo $board->at(16,16)->getStone();
 
