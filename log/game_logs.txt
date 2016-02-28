@@ -1,0 +1,2 @@
+{"pid":"56d3436c397b3","strategy":"Random","playerMoves":[],"computerMoves":[]}
+{"pid":"56d343a2bdb3d","strategy":"Smart","playerMoves":[],"computerMoves":[]}
