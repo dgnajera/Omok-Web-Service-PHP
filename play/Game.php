@@ -144,7 +144,14 @@
 
 		}
 	}
+	class smartStrategy{
+	      var $board;
 
+	      function smartStrategy($board){
+	      	       $this->board = $board;
+		       }
+	    	 
+	}
 	class RandomStrategy {
 		var $board;
 
