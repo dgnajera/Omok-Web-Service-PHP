@@ -18,6 +18,10 @@
 		var $computerMoves;
 		var $strategy;
 
+		var $logs;
+		var $gameStatus;
+		var $index;
+
 
 		//Board Constructor
 		function Board($size){
@@ -43,7 +47,14 @@
 			$place = $this -> at($x,$y);
 			if($place->hasStone())
 				exit;
-		
+			
+			array_push($this->gameStatus['playerMoves'],[(int)$x,(int)$y]);			
+
+			$this->logs[$this->index] = json_encode($this->gameStatus);
+			$updatedLogs = implode('|',$this->logs);
+
+			file_put_contents('../log/game_logs.txt', $updatedLogs);
+
 			$this->checkWin($x,$y,$player); 
 			if(!empty($this->$row))
 				$this->isWin = true;
@@ -258,20 +269,23 @@
 			return true;
 		}
 
-		function load($gameStatus){
-			$this->strategy = $gameStatus['strategy'];
-			$this->playerMoves = $gameStatus['playerMoves'];
-			$this->computerMoves = $gameStatus['computerMoves'];
+		function load($logs,$index){
+			$this->logs = $logs;
+			$this->index = $index;
+			$this->gameStatus = json_decode($logs[$index],true);
+			$this->strategy = $this->gameStatus['strategy'];
+			$this->playerMoves = $this->gameStatus['playerMoves'];
+			$this->computerMoves = $this->gameStatus['computerMoves'];
 
-			if(!empty($gameStatus['playerMoves'])){
-				foreach($gameStatus['playerMoves'] as $currentMove){
+			if(!empty($this->gameStatus['playerMoves'])){
+				foreach($this->gameStatus['playerMoves'] as $currentMove){
 					list($x,$y) = $currentMove;
 					$this->placeStone($x,$y);
 				}
 			}
 
-			if(!empty($gameStatus['computerMoves'])){
-				foreach($gameStatus['computerMoves'] as $currentMove){
+			if(!empty($this->gameStatus['computerMoves'])){
+				foreach($this->gameStatus['computerMoves'] as $currentMove){
 					list($x,$y) = $currentMove;
 					$this->placeStone($x,$y);
 				}

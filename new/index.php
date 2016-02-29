@@ -3,13 +3,21 @@
 
 	$pid = uniqid();
 	$file = fopen("../log/game_logs.txt","a");
+	if(filesize('../log/game_logs.txt') == 0)
+		fwrite($file, json_encode(array(
+			'pid' => $pid, 
+			'strategy' => $_GET['strategy'],
+			'playerMoves' => [],
+			'computerMoves' => []
+		)));
 
-	fwrite($file, json_encode(array(
-		'pid' => $pid, 
-		'strategy' => $_GET['strategy'],
-		'playerMoves' => [],
-		'computerMoves' => []
-	)) . PHP_EOL);
+	else 
+		fwrite($file, '|'.json_encode(array(
+			'pid' => $pid, 
+			'strategy' => $_GET['strategy'],
+			'playerMoves' => [],
+			'computerMoves' => []
+		)));
 
 	fclose($file);
 	

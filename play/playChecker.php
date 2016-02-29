@@ -7,10 +7,10 @@
 	}
 	
 	//store all the logs (game_logs.txt) into the array $logs
-	$logs = explode(PHP_EOL, file_get_contents('../log/game_logs.txt'));
+	$logs = explode('|', file_get_contents('../log/game_logs.txt'));
 
 	$index = -1;
-	for($i = 0; $i < count($logs)-1; $i++){
+	for($i = 0; $i < count($logs); $i++){
 		$gameStatus = json_decode($logs[$i],true);
 		if($gameStatus['pid'] == $_GET['pid']){
 			$index = $i;
@@ -19,7 +19,7 @@
 	}
 
 	//case where pid was not found or there are no game logs
-	if($index == -1 || filesize('../log/game_logs.txt') == 0){
+	if($index == -1){
 		echo json_encode(array('response' => false, 'reason' => "Unknown pid"));
 		exit;
 	} 

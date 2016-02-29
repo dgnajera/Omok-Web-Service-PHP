@@ -1,9 +1,1 @@
-{"pid":"56d3436c397b3","strategy":"Random","playerMoves":[],"computerMoves":[]}
-{"pid":"56d343a2bdb3d","strategy":"Smart","playerMoves":[],"computerMoves":[]}
-{"pid":"56d40df3b4f35","strategy":"Random","playerMoves":[],"computerMoves":[]}
-{"pid":"56d40f887bd2b","strategy":"Random","playerMoves":[],"computerMoves":[]}
-{"pid":"56d410733e229","strategy":"Random","playerMoves":[],"computerMoves":[]}
-{"pid":"56d4117e0d007","strategy":"Random","playerMoves":[],"computerMoves":[]}
-{"pid":"56d4124085671","strategy":"Random","playerMoves":[],"computerMoves":[]}
-{"pid":"56d4133bcdda8","strategy":"Random","playerMoves":[],"computerMoves":[]}
-{"pid":"56d413606f2aa","strategy":"Random","playerMoves":[],"computerMoves":[]}
+{"pid":"56d43a6197994","strategy":"Random","playerMoves":[[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1],[2,1]],"computerMoves":[]}
