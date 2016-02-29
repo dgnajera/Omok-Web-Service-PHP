@@ -8,6 +8,10 @@
 		var $isWin;
 		var $isDraw;
 		var $row;
+		var $computerWin;
+		var $computerDraw;
+		var $computerRow;
+		var $gameStatus;
 
 		//Board Constructor
 		function Board($size){
@@ -27,12 +31,39 @@
 		}
 
 		function placeStone($x,$y,$player){
-			$place = $this -> at($x,$y,$player);
-			
-		}
+			$place = $this -> at($x,$y);
+			if($place->hasStone())
+				exit;
+		
+			$response = true;
+			$this->checkWin(); 
 
-			// if($response){
-			// 	checkWin(); //write this	
+			if(!empty($this->$row))
+				$this->isWin = true;
+			$this->checkDraw();
+
+			if(!$this->isWin && $this->isDraw)
+				$this->draw = true;
+
+			if($gameStatus['strategy']=="Random")
+				
+			echo json_encode(array(
+				'response'=>$response,
+				'ack_move'=> json_encode(array(
+					'x'=>$x,
+					'y'=>$y,
+					'isWin'=>$this->isWin,
+					'isDraw'=>$this->isDraw,
+					'row'=>$this->row
+				)),
+				'move'=> json_encode(array(	
+					'x'=>$computerX,
+					'y'=>$computerY,
+					'isWin'=>$computerWin,
+					'isDraw'=>$computerDraw,
+					'row'=>$computerRow
+				))
+			));
 			// 	checkDraw(); //write this
 
 			// 	if($isWin){
@@ -66,7 +97,7 @@
 			// 		['y']=>$
 			// 	))
 			// ));
-		// }
+		}
 		function at($x,$y){
 			foreach($this->places as &$place)
 				if($place->getX() == $x-1 && $place->getY() == $y-1)
@@ -80,71 +111,71 @@
 				$this->at($x,$y,$player) == $this->at($x-2,$y,$player) &&
 				$this->at($x,$y,$player) == $this->at($x-3,$y,$player) &&
 				$this->at($x,$y,$player) == $this->at($x-4,$y,$player))
-					return array($x-4,$y,$x-3,$y,$x-2,$y,$x-1,$y,$x,$y);
+					$this->row = array($x-4,$y,$x-3,$y,$x-2,$y,$x-1,$y,$x,$y);
 			
 
 			if($this->at($x,$y,$player) == $this->at($x-1,$y,$player) &&
 				$this->at($x,$y,$player) == $this->at($x-2,$y,$player) &&
 				$this->at($x,$y,$player) == $this->at($x-3,$y,$player) &&
 				$this->at($x,$y,$player) == $this->at($x+1,$y,$player))
-					return array($x+1,$y,$x,$y,$x-1,$y,$x-2,$y,$x-3,$y);
+					$this->row =  array($x+1,$y,$x,$y,$x-1,$y,$x-2,$y,$x-3,$y);
 
 			if($this->at($x,$y,$player) == $this->at($x-1,$y,$player) &&
 				$this->at($x,$y,$player) == $this->at($x-2,$y,$player) &&
 				$this->at($x,$y,$player) == $this->at($x+1,$y,$player) &&
 				$this->at($x,$y,$player) == $this->at($x+2,$y,$player))
-					return array($x+2,$y,$x+1,$y,$x,$y,$x-1,$y,$x-2,$y);
+					$this->row =  array($x+2,$y,$x+1,$y,$x,$y,$x-1,$y,$x-2,$y);
 
 			if($this->at($x,$y,$player) == $this->at($x-1,$y,$player) &&
 				$this->at($x,$y,$player) == $this->at($x+1,$y,$player) &&
 				$this->at($x,$y,$player) == $this->at($x+2,$y,$player) &&
 				$this->at($x,$y,$player) == $this->at($x+3,$y,$player))
-					return array($x+3,$y,$x+2,$y,$x+1,$y,$x,$y,$x-1,$y);
+					$this->row =  array($x+3,$y,$x+2,$y,$x+1,$y,$x,$y,$x-1,$y);
 
 			if($this->at($x,$y,$player) == $this->at($x+1,$y,$player) &&
 				$this->at($x,$y,$player) == $this->at($x+2,$y,$player) &&
 				$this->at($x,$y,$player) == $this->at($x+3,$y,$player) &&
 				$this->at($x,$y,$player) == $this->at($x+4,$y,$player))
-					return array($x+4,$y,$x+3,$y,$x+2,$y,$x+1,$y,$x,$y);
+					$this->row =  array($x+4,$y,$x+3,$y,$x+2,$y,$x+1,$y,$x,$y);
 
 			//check vertical wins
 			if($this->at($x,$y,$player) == $this->at($x,$y-1,$player) &&
 				$this->at($x,$y,$player) == $this->at($x,$y-2,$player) &&
 				$this->at($x,$y,$player) == $this->at($x,$y-3,$player) &&
 				$this->at($x,$y,$player) == $this->at($x,$y-4,$player))
-					return array($x,$y-4,$x,$y-3,$x,$y-2,$x,$y-1,$x,$y);
+					$this->row =  array($x,$y-4,$x,$y-3,$x,$y-2,$x,$y-1,$x,$y);
 			
 
 			if($this->at($x,$y,$player) == $this->at($x,$y-1,$player) &&
 				$this->at($x,$y,$player) == $this->at($x,$y-2,$player) &&
 				$this->at($x,$y,$player) == $this->at($x,$y-3,$player) &&
 				$this->at($x,$y,$player) == $this->at($x,$y+1,$player))
-					return array($x,$y+1,$x,$y,$x,$y-1,$x,$y-2,$x,$y-3);
+					$this->row =  array($x,$y+1,$x,$y,$x,$y-1,$x,$y-2,$x,$y-3);
 
 			if($this->at($x,$y,$player) == $this->at($x,$y-1,$player) &&
 				$this->at($x,$y,$player) == $this->at($x,$y-2,$player) &&
 				$this->at($x,$y,$player) == $this->at($x,$y+1,$player) &&
 				$this->at($x,$y,$player) == $this->at($x,$y+2,$player))
-					return array($x,$y+2,$x,$y+1,$x,$y,$x,$y-1,$x,$y-2);
+					$this->row =  array($x,$y+2,$x,$y+1,$x,$y,$x,$y-1,$x,$y-2);
 
 			if($this->at($x,$y,$player) == $this->at($x,$y-1,$player) &&
 				$this->at($x,$y,$player) == $this->at($x,$y+1,$player) &&
 				$this->at($x,$y,$player) == $this->at($x,$y+2,$player) &&
 				$this->at($x,$y,$player) == $this->at($x,$y+3,$player))
-					return array($x,$y+3,$x,$y+2,$x,$y+1,$x,$y,$x,$y-1);
+					$this->row =  array($x,$y+3,$x,$y+2,$x,$y+1,$x,$y,$x,$y-1);
 
 			if($this->at($x,$y,$player) == $this->at($x,$y+1,$player) &&
 				$this->at($x,$y,$player) == $this->at($x,$y+2,$player) &&
 				$this->at($x,$y,$player) == $this->at($x,$y+3,$player) &&
 				$this->at($x,$y,$player) == $this->at($x,$y+4,$player))
-					return array($x,$y+4,$x,$y+3,$x,$y+2,$x,$y+1,$x,$y);
+					$this->row =  array($x,$y+4,$x,$y+3,$x,$y+2,$x,$y+1,$x,$y);
 
 			//check diagonal wins (top left to bottom right)
 			if($this->at($x,$y,$player) == $this->at($x-1,$y-1,$player) &&
 				$this->at($x,$y,$player) == $this->at($x-2,$y-2,$player) &&
 				$this->at($x,$y,$player) == $this->at($x-3,$y-3,$player) &&
 				$this->at($x,$y,$player) == $this->at($x-4,$y-4,$player))
-					return array($x-4,$y-4,$x-3,$y-3,$x-2,$y-2,$x-1,$y-1,$x,$y);
+					$this->row =  array($x-4,$y-4,$x-3,$y-3,$x-2,$y-2,$x-1,$y-1,$x,$y);
 			
 
 
@@ -152,28 +183,26 @@
 				$this->at($x,$y,$player) == $this->at($x-2,$y-2,$player) &&
 				$this->at($x,$y,$player) == $this->at($x-3,$y-3,$player) &&
 				$this->at($x,$y,$player) == $this->at($x+1,$y+1,$player))
-					return array($x+1,$y+1,$x,$y,$x-1,$y-1,$x-2,$y-2,$x-3,$y-3);
+					$this->row =  array($x+1,$y+1,$x,$y,$x-1,$y-1,$x-2,$y-2,$x-3,$y-3);
 
 			if($this->at($x,$y,$player) == $this->at($x-1,$y-1,$player) &&
 				$this->at($x,$y,$player) == $this->at($x-2,$y-2,$player) &&
 				$this->at($x,$y,$player) == $this->at($x+1,$y+1,$player) &&
 				$this->at($x,$y,$player) == $this->at($x+2,$y+2,$player))
-					return array($x+2,$y+2,$x+1,$y+1,$x,$y,$x-1,$y-1,$x-2,$y-2);
+					$this->row =  array($x+2,$y+2,$x+1,$y+1,$x,$y,$x-1,$y-1,$x-2,$y-2);
 
 			if($this->at($x,$y,$player) == $this->at($x-1,$y-1,$player) &&
 				$this->at($x,$y,$player) == $this->at($x+1,$y+1,$player) &&
 				$this->at($x,$y,$player) == $this->at($x+2,$y+2,$player) &&
 				$this->at($x,$y,$player) == $this->at($x+3,$y+3,$player))
-					return array($x+3,$y+3,$x+2,$y+2,$x+1,$y+1,$x,$y,$x-1,$y-1);
+					$this->row =  array($x+3,$y+3,$x+2,$y+2,$x+1,$y+1,$x,$y,$x-1,$y-1);
 
 			if($this->at($x,$y,$player) == $this->at($x+1,$y+1,$player) &&
 				$this->at($x,$y,$player) == $this->at($x+2,$y+2,$player) &&
 				$this->at($x,$y,$player) == $this->at($x+3,$y+3,$player) &&
 				$this->at($x,$y,$player) == $this->at($x+4,$y+4,$player))
-					return array($x+4,$y+4,$x+3,$y+3,$x+2,$y+2,$x+1,$y+1,$x,$y);
+					$this->row =  array($x+4,$y+4,$x+3,$y+3,$x+2,$y+2,$x+1,$y+1,$x,$y);
 
-
-			return null;
 		}
 
 		function checkDraw(){
@@ -185,7 +214,7 @@
 		}
 
 		function load($log){
-			$gameStatus = json_decode($log,true);
+			$this->$gameStatus = json_decode($log,true);
 
 			foreach($gameStatus['playerMoves'] as $currentMove){
 				list($x,$y) = $currentMove;

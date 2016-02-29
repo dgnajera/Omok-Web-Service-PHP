@@ -4,7 +4,7 @@
 	include 'Game.php';
 
 	$board = new Board($size);
-	// $board->load($logs[$index]);->hasStone();
+	$board->load($logs[$index]);
 	
 	foreach($board->places as &$place){
 		echo "(";
