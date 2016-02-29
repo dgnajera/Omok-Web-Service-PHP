@@ -1,4 +1,11 @@
 <?php 	
+/*
+Name: Damian Najera
+Partner: Ezequiel Rios
+Professor: Dr. Cheon
+Date of Last Revision: 2/29/16
+Assignment: Project 1 (PHP)
+*/
 	class Place {
 		private $x;
 		private $y;
@@ -12,6 +19,7 @@
 			$this->hasStone = false;
 		}
 
+		//Getters
 		function getX(){
 		 	return $this->x;
 		}
@@ -28,6 +36,7 @@
 			return $this->hasStone;
 		}
 
+		//places a specific stone on the place
 		function placeStone($identifier){
 			$this->stone = $identifier;
 		 	$this->hasStone = true;

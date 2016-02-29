@@ -1,27 +1,29 @@
 <?php 
+/*
+Name: Damian Najera
+Partner: Ezequiel Rios
+Professor: Dr. Cheon
+Date of Last Revision: 2/29/16
+Assignment: Project 1 (PHP)
+*/
 	include 'Place.php'; 
 	include 'playChecker.php';
 
 	class Board {
 		var $size;
-
 		var $places;
 		var $isWin;
 		var $isDraw;
 		var $row;
-
 		var $computerWin;
 		var $computerDraw;
 		var $computerRow;
-
 		var $playerMoves;
 		var $computerMoves;
 		var $strategy;
-
 		var $logs;
 		var $gameStatus;
 		var $index;
-
 
 		//Board Constructor
 		function Board($size){
@@ -34,15 +36,18 @@
 			$this->computerDraw = false;
 			$this->computerRow = [];
 
+			//initialize an array of available places for the board
 			for($i = 0; $i < $size; $i++)
 				for($j = 0; $j < $size; $j++)
 					array_push($this->places, new Place($i,$j));
 		}
 
+		//return the size of the board
 		function getSize(){
 			return $this->size;
 		}
 
+		//handles the main flow of the game (entrace to game)
 		function placeStone($x,$y){
 			$place = $this -> at($x,$y);
 
@@ -88,6 +93,7 @@
 			echo json_encode($serverResponse);
 		}
 
+		//helper to generate a response for player/computer moves
 		function generateMoveResponse($x,$y,$identifier){
 			if($identifier == 'player'){
 				if($this->isWin){
@@ -156,6 +162,7 @@
 				);
 		}
 
+		//takes in an array and returns it as a formatted string
 		function rowContents($row){
 			$i = 0;
 			$n = count($row);
@@ -171,6 +178,7 @@
 			return $rowContents;
 		}
 
+		//returns the Place at ($x,$y)
 		function at($x,$y){
 			$place = null;
 
@@ -183,6 +191,7 @@
 			return $place;
 		}
 
+		//iterates through an array of places and returns true if there is an invalid place
 		function hasNullPlaces($places){
 			foreach($places as $place)
 				if(is_null($place))
@@ -190,6 +199,7 @@
 			return false;
 		}
 
+		//checks if the given list of places all have the same stone places on it
 		function placesHaveSameStone($places){
 			list($place1,$place2,$place3,$place4,$place5) = $places;
 			if($place1->getStone() == $place2->getStone() &&
@@ -202,6 +212,7 @@
 		}
 
 		function checkWin($x,$y){
+
 			//check horizontal wins 
 			$place1 = $this->at($x,$y);
 			$place2 = $this->at($x-1,$y);
@@ -607,6 +618,7 @@
 			}
 		}
 
+		//returns true if all places are filled and there is no win (no more moves left)
 		function checkDraw($identifier){
 			foreach($this->places as $place)
 				if(!$place->hasStone())
@@ -621,6 +633,7 @@
 			return true;
 		}
 
+		//loads the contents of a game from the game_logs.txt file
 		function load($logs,$index){
 			$this->logs = $logs;
 			$this->index = $index;
@@ -629,6 +642,7 @@
 			$this->playerMoves = $this->gameStatus['playerMoves'];
 			$this->computerMoves = $this->gameStatus['computerMoves'];
 
+			//restores previous player moves to the board
 			if(!empty($this->gameStatus['playerMoves'])){
 				foreach($this->gameStatus['playerMoves'] as $currentMove){
 					list($x,$y) = $currentMove;
@@ -636,6 +650,7 @@
 				}
 			}
 
+			//restores previous computer moves to the board
 			if(!empty($this->gameStatus['computerMoves'])){
 				foreach($this->gameStatus['computerMoves'] as $currentMove){
 					list($x,$y) = $currentMove;
@@ -645,8 +660,6 @@
 		}
 	}
 
-
-
 	class RandomStrategy {
 		var $board;
 
@@ -654,13 +667,14 @@
 			$this->board = $board;
 		}
 
+		//generate random coordinates, see if there is a stone there, place if not
 		function placeStone(){
 			while(true){
 				$randomX = rand(0,$this->board->getSize()-1);
 				$randomY = rand(0,$this->board->getSize()-1);
 				if(!$this->board->at($randomX,$randomY)->hasStone()){
 					$this->board->at($randomX,$randomY)->placeStone("computer");
-					// $this->board->computerWin = $this->board->checkWin($randomX,$randomY);
+					$this->board->computerWin = $this->board->checkWin($randomX,$randomY);
 					$this->board->computerDraw = $this->board->checkDraw($randomX,$randomY,"computer");
 					return array($randomX,$randomY);
 				}
