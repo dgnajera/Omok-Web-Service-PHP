@@ -171,13 +171,6 @@
 			}
 		}
 	}
-
-	function getUsedPlaces(){
-
-	}
-	class SmartStrategy{
-	
-	}
 	// $board = new Board(15);
 	// $random = new RandomStrategy($board);
 	// $random->placeStone();
