@@ -65,7 +65,7 @@
 
 			//Find strategy to be used and have it generate a move and
 			//update the list of computer moves with the new move [$computerX,$computerY]
-			if($this->strategy=="Random"){
+			if($this->strategy=="Random" && !$this->isWin){
 				$randomComputer = new RandomStrategy($this);
 				list($computerX,$computerY) = $randomComputer->placeStone(); 
 				array_push($this->gameStatus['computerMoves'],[(int)$computerX,(int)$computerY]);			
@@ -82,7 +82,8 @@
 			//generate server response
 			$serverResponse['response'] = true;
 			$serverResponse['ack_move'] = $this->generateMoveResponse($x,$y,"player");
-			$serverResponse['move'] = $this->generateMoveResponse($computerX,$computerY,"computer");
+			if(!$this->isWin)
+				$serverResponse['move'] = $this->generateMoveResponse($computerX,$computerY,"computer");
 
 			echo json_encode($serverResponse);
 		}
@@ -100,7 +101,7 @@
 					);
 				}
 
-				else if($this->isDraw){
+				if($this->isDraw){
 					return json_decode(
 						'{"x":' .$x.
 						',"y":' .$y.
@@ -111,15 +112,14 @@
 					);
 				}
 
-				else 
-					return json_decode(
-						'{"x":' .$x.
-						',"y":' .$y.
-						',"isWin":false' . 
-						',"isDraw":false' . 
-						',"row":'.$this->rowContents($this->row). 
-						'}'
-					);
+				return json_decode(
+					'{"x":' .$x.
+					',"y":' .$y.
+					',"isWin":false' . 
+					',"isDraw":false' . 
+					',"row":'.$this->rowContents($this->row). 
+					'}'
+				);
 			}
 
 			//$identifier != player, so it must be $identifier == computer
@@ -157,9 +157,16 @@
 		}
 
 		function rowContents($row){
+			$i = 0;
+			$n = count($row);
 			$rowContents = '[';
-			foreach($row as $currentCoordinate)
-				$rowContents .= $currentCoordinate;
+			foreach($row as $currentCoordinate){
+				if($i == $n - 1)
+					$rowContents .= $currentCoordinate;
+				else
+					$rowContents .= $currentCoordinate.',';
+				$i++;
+			}
 			$rowContents .= ']';
 			return $rowContents;
 		}
@@ -205,7 +212,7 @@
 			if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
 				if($this->placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
 						if($place1->getStone() == "player"){
-							$this->row = json_encode(array($x-4,$y,$x-3,$y,$x-2,$y,$x-1,$y,$x,$y));
+							$this->row = array($x-4,$y,$x-3,$y,$x-2,$y,$x-1,$y,$x,$y);
 							$this->isWin = true;
 						}
 
@@ -216,86 +223,86 @@
 				}
 			}
 
-			// $place1 = $this->at($x,$y);
-			// $place2 = $this->at($x-1,$y);
-			// $place3 = $this->at($x-2,$y);
-			// $place4 = $this->at($x-3,$y);
-			// $place5 = $this->at($x+1,$y);
+			$place1 = $this->at($x,$y);
+			$place2 = $this->at($x-1,$y);
+			$place3 = $this->at($x-2,$y);
+			$place4 = $this->at($x-3,$y);
+			$place5 = $this->at($x+1,$y);
 
-			// if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
-			// 	if(placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
-			// 			if($place1->getStone() == "player"){
-			// 				$this->row =  array($x+1,$y,$x,$y,$x-1,$y,$x-2,$y,$x-3,$y);
-			// 				$this->isWin = true;
-			// 			}
+			if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
+				if($this->placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
+						if($place1->getStone() == "player"){
+							$this->row =  array($x+1,$y,$x,$y,$x-1,$y,$x-2,$y,$x-3,$y);
+							$this->isWin = true;
+						}
 
-			// 			if($place1->getStone() == "computer"){
-			// 				$this->row =  array($x+1,$y,$x,$y,$x-1,$y,$x-2,$y,$x-3,$y);
-			// 				$this->computerWin = true;
-			// 			}
-			// 	}
-			// }
+						if($place1->getStone() == "computer"){
+							$this->row =  array($x+1,$y,$x,$y,$x-1,$y,$x-2,$y,$x-3,$y);
+							$this->computerWin = true;
+						}
+				}
+			}
 
-			// $place1 = $this->at($x,$y);
-			// $place2 = $this->at($x-1,$y);
-			// $place3 = $this->at($x-2,$y);
-			// $place4 = $this->at($x+1,$y);
-			// $place5 = $this->at($x+2,$y);
+			$place1 = $this->at($x,$y);
+			$place2 = $this->at($x-1,$y);
+			$place3 = $this->at($x-2,$y);
+			$place4 = $this->at($x+1,$y);
+			$place5 = $this->at($x+2,$y);
 
-			// if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
-			// 	if(placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
-			// 			if($place1->getStone() == "player"){
-			// 				$this->row =  array($x+2,$y,$x+1,$y,$x,$y,$x-1,$y,$x-2,$y);
-			// 				$this->isWin = true;
-			// 			}
+			if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
+				if($this->placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
+						if($place1->getStone() == "player"){
+							$this->row =  array($x+2,$y,$x+1,$y,$x,$y,$x-1,$y,$x-2,$y);
+							$this->isWin = true;
+						}
 
-			// 			if($place1->getStone() == "computer"){
-			// 				$this->row =  array($x+2,$y,$x+1,$y,$x,$y,$x-1,$y,$x-2,$y);
-			// 				$this->computerWin = true;
-			// 			}
-			// 	}
-			// }
+						if($place1->getStone() == "computer"){
+							$this->row =  array($x+2,$y,$x+1,$y,$x,$y,$x-1,$y,$x-2,$y);
+							$this->computerWin = true;
+						}
+				}
+			}
 
-			// $place1 = $this->at($x,$y);
-			// $place2 = $this->at($x-1,$y);
-			// $place3 = $this->at($x+1,$y);
-			// $place4 = $this->at($x+2,$y);
-			// $place5 = $this->at($x+3,$y);
+			$place1 = $this->at($x,$y);
+			$place2 = $this->at($x-1,$y);
+			$place3 = $this->at($x+1,$y);
+			$place4 = $this->at($x+2,$y);
+			$place5 = $this->at($x+3,$y);
 
-			// if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
-			// 	if(placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
-			// 			if($place1->getStone() == "player"){
-			// 				$this->row =  array($x+3,$y,$x+2,$y,$x+1,$y,$x,$y,$x-1,$y);
-			// 				$this->isWin = true;
-			// 			}
+			if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
+				if($this->placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
+						if($place1->getStone() == "player"){
+							$this->row =  array($x+3,$y,$x+2,$y,$x+1,$y,$x,$y,$x-1,$y);
+							$this->isWin = true;
+						}
 
-			// 			if($place1->getStone() == "computer"){
-			// 				$this->row =  array($x+3,$y,$x+2,$y,$x+1,$y,$x,$y,$x-1,$y);
-			// 				$this->computerWin = true;
-			// 			}
-			// 	}
-			// }
+						if($place1->getStone() == "computer"){
+							$this->row =  array($x+3,$y,$x+2,$y,$x+1,$y,$x,$y,$x-1,$y);
+							$this->computerWin = true;
+						}
+				}
+			}
 
-			// $place1 = $this->at($x,$y);
-			// $place2 = $this->at($x+1,$y);
-			// $place3 = $this->at($x+2,$y);
-			// $place4 = $this->at($x+3,$y);
-			// $place5 = $this->at($x+4,$y);
+			$place1 = $this->at($x,$y);
+			$place2 = $this->at($x+1,$y);
+			$place3 = $this->at($x+2,$y);
+			$place4 = $this->at($x+3,$y);
+			$place5 = $this->at($x+4,$y);
 
-			// if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
-			// 	if(placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
-			// 			if($place1->getStone() == "player"){
-			// 				$this->row =  array($x+4,$y,$x+3,$y,$x+2,$y,$x+1,$y,$x,$y);
-			// 				$this->isWin = true;
-			// 			}
+			if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
+				if($this->placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
+						if($place1->getStone() == "player"){
+							$this->row =  array($x+4,$y,$x+3,$y,$x+2,$y,$x+1,$y,$x,$y);
+							$this->isWin = true;
+						}
 
-			// 			if($place1->getStone() == "computer"){
-			// 				$this->row =  array($x+4,$y,$x+3,$y,$x+2,$y,$x+1,$y,$x,$y);
-			// 				$this->computerWin = true;
-			// 			}
-			// 	}
-			// }
-/*
+						if($place1->getStone() == "computer"){
+							$this->row =  array($x+4,$y,$x+3,$y,$x+2,$y,$x+1,$y,$x,$y);
+							$this->computerWin = true;
+						}
+				}
+			}
+
 			// check vertical wins
 			$place1 = $this->at($x,$y);
 			$place2 = $this->at($x,$y-1);
@@ -303,8 +310,8 @@
 			$place4 = $this->at($x,$y-3);
 			$place5 = $this->at($x,$y-4);
 
-			if(!hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
-				if(placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
+			if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
+				if($this->placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
 						if($place1->getStone() == "player"){
 							$this->row =  array($x,$y-4,$x,$y-3,$x,$y-2,$x,$y-1,$x,$y);
 							$this->isWin = true;
@@ -323,8 +330,8 @@
 			$place4 = $this->at($x,$y-3);
 			$place5 = $this->at($x,$y+1);
 
-			if(!hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
-				if(placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
+			if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
+				if($this->placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
 						if($place1->getStone() == "player"){
 							$this->row =  array($x,$y+1,$x,$y,$x,$y-1,$x,$y-2,$x,$y-3);
 							$this->isWin = true;
@@ -343,8 +350,8 @@
 			$place4 = $this->at($x,$y+1);
 			$place5 = $this->at($x,$y+2);
 
-			if(!hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
-				if(placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
+			if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
+				if($this->placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
 						if($place1->getStone() == "player"){
 							$this->row =  array($x,$y+2,$x,$y+1,$x,$y,$x,$y-1,$x,$y-2);
 							$this->isWin = true;
@@ -363,8 +370,8 @@
 			$place4 = $this->at($x,$y+2);
 			$place5 = $this->at($x,$y+3);
 
-			if(!hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
-				if(placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
+			if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
+				if($this->placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
 						if($place1->getStone() == "player"){
 							$this->row =  array($x,$y+3,$x,$y+2,$x,$y+1,$x,$y,$x,$y-1);
 							$this->isWin = true;
@@ -381,10 +388,10 @@
 			$place2 = $this->at($x,$y+1);
 			$place3 = $this->at($x,$y+2);
 			$place4 = $this->at($x,$y+3);
-			$place5 = $this->at($x,$y+1);
+			$place5 = $this->at($x,$y+4);
 
-			if(!hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
-				if(placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
+			if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
+				if($this->placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
 						if($place1->getStone() == "player"){
 							$this->row =  array($x,$y+4,$x,$y+3,$x,$y+2,$x,$y+1,$x,$y);
 							$this->isWin = true;
@@ -398,15 +405,14 @@
 			}
 
 			// check diagonal wins (top left to bottom right)
-
 			$place1 = $this->at($x,$y);
 			$place2 = $this->at($x-1,$y-1);
 			$place3 = $this->at($x-2,$y-2);
 			$place4 = $this->at($x-3,$y-3);
 			$place5 = $this->at($x-4,$y-4);
 
-			if(!hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
-				if(placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
+			if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
+				if($this->placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
 						if($place1->getStone() == "player"){
 							$this->row =  array($x-4,$y-4,$x-3,$y-3,$x-2,$y-2,$x-1,$y-1,$x,$y);
 							$this->isWin = true;
@@ -423,10 +429,10 @@
 			$place2 = $this->at($x-1,$y-1);
 			$place3 = $this->at($x-2,$y-2);
 			$place4 = $this->at($x-3,$y-3);
-			$place5 = $this->at($x-4,$y-4);
+			$place5 = $this->at($x+1,$y+1);
 
-			if(!hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
-				if(placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
+			if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
+				if($this->placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
 						if($place1->getStone() == "player"){
 							$this->row =  array($x+1,$y+1,$x,$y,$x-1,$y-1,$x-2,$y-2,$x-3,$y-3);
 							$this->isWin = true;
@@ -442,11 +448,11 @@
 			$place1 = $this->at($x,$y);
 			$place2 = $this->at($x-1,$y-1);
 			$place3 = $this->at($x-2,$y-2);
-			$place4 = $this->at($x-3,$y-3);
-			$place5 = $this->at($x-4,$y-4);
+			$place4 = $this->at($x+1,$y+1);
+			$place5 = $this->at($x+2,$y+2);
 
-			if(!hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
-				if(placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
+			if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
+				if($this->placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
 						if($place1->getStone() == "player"){
 							$this->row =  array($x+2,$y+2,$x+1,$y+1,$x,$y,$x-1,$y-1,$x-2,$y-2);
 							$this->isWin = true;
@@ -461,12 +467,12 @@
 
 			$place1 = $this->at($x,$y);
 			$place2 = $this->at($x-1,$y-1);
-			$place3 = $this->at($x-2,$y-2);
-			$place4 = $this->at($x-3,$y-3);
-			$place5 = $this->at($x-4,$y-4);
+			$place3 = $this->at($x+1,$y+1);
+			$place4 = $this->at($x+2,$y+2);
+			$place5 = $this->at($x+3,$y+3);
 
-			if(!hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
-				if(placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
+			if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
+				if($this->placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
 						if($place1->getStone() == "player"){
 							$this->row =  array($x+3,$y+3,$x+2,$y+2,$x+1,$y+1,$x,$y,$x-1,$y-1);
 							$this->isWin = true;
@@ -480,13 +486,13 @@
 			}
 
 			$place1 = $this->at($x,$y);
-			$place2 = $this->at($x-1,$y-1);
-			$place3 = $this->at($x-2,$y-2);
-			$place4 = $this->at($x-3,$y-3);
-			$place5 = $this->at($x-4,$y-4);
+			$place2 = $this->at($x+1,$y+1);
+			$place3 = $this->at($x+2,$y+2);
+			$place4 = $this->at($x+3,$y+3);
+			$place5 = $this->at($x+4,$y+4);
 
-			if(!hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
-				if(placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
+			if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
+				if($this->placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
 						if($place1->getStone() == "player"){
 							$this->row =  array($x+4,$y+4,$x+3,$y+3,$x+2,$y+2,$x+1,$y+1,$x,$y);
 							$this->isWin = true;
@@ -499,106 +505,106 @@
 				}
 			}
 
+			// check diagonal wins (bottom left to tops right)
 			$place1 = $this->at($x,$y);
-			$place2 = $this->at($x-1,$y-1);
-			$place3 = $this->at($x-2,$y-2);
-			$place4 = $this->at($x-3,$y-3);
-			$place5 = $this->at($x-4,$y-4);
-*/
-			//check diagonal wins (bottom left to top right)
-			// if(!hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
-			// 	if(placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
-			// 			if($place1->getStone() == "player"){
-			// 				$this->row =  array($x-4,$y-4,$x-3,$y-3,$x-2,$y-2,$x-1,$y-1,$x,$y);
-			// 				$this->isWin = true;
-			// 			}
+			$place2 = $this->at($x-1,$y+1);
+			$place3 = $this->at($x-2,$y+2);
+			$place4 = $this->at($x-3,$y+3);
+			$place5 = $this->at($x-4,$y+4);
 
-			// 			if($place1->getStone() == "computer"){
-			// 				$this->computerRow =  array($x-4,$y-4,$x-3,$y-3,$x-2,$y-2,$x-1,$y-1,$x,$y);
-			// 				$this->computerWin = true;
-			// 			}
-			// 	}
-			// }
-	
-			// $place1 = $this->at($x,$y);
-			// $place2 = $this->at($x-1,$y-1);
-			// $place3 = $this->at($x-2,$y-2);
-			// $place4 = $this->at($x-3,$y-3);
-			// $place5 = $this->at($x-4,$y-4);
+			if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
+				if($this->placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
+						if($place1->getStone() == "player"){
+							$this->row =  array($x-4,$y+4,$x-3,$y+3,$x-2,$y+2,$x-1,$y+1,$x,$y);
+							$this->isWin = true;
+						}
 
-			// if(!hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
-			// 	if(placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
-			// 			if($place1->getStone() == "player"){
-			// 				$this->row =  array($x+1,$y+1,$x,$y,$x-1,$y-1,$x-2,$y-2,$x-3,$y-3);
-			// 				$this->isWin = true;
-			// 			}
+						if($place1->getStone() == "computer"){
+							$this->computerRow =  array($x-4,$y+4,$x-3,$y+3,$x-2,$y+2,$x-1,$y+1,$x,$y);
+							$this->computerWin = true;
+						}
+				}
+			}
 
-			// 			if($place1->getStone() == "computer"){
-			// 				$this->computerRow =  array($x+1,$y+1,$x,$y,$x-1,$y-1,$x-2,$y-2,$x-3,$y-3);
-			// 				$this->computerWin = true;
-			// 			}
-			// 	}
-			// }
+			$place1 = $this->at($x,$y);
+			$place2 = $this->at($x-1,$y+1);
+			$place3 = $this->at($x-2,$y+2);
+			$place4 = $this->at($x-3,$y+3);
+			$place5 = $this->at($x+1,$y-1);
 
-			// $place1 = $this->at($x,$y);
-			// $place2 = $this->at($x-1,$y-1);
-			// $place3 = $this->at($x-2,$y-2);
-			// $place4 = $this->at($x-3,$y-3);
-			// $place5 = $this->at($x-4,$y-4);
+			if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
+				if($this->placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
+						if($place1->getStone() == "player"){
+							$this->row =  array($x-1,$y+1,$x,$y,$x-2,$y+2,$x-3,$y+3,$x+1,$y-1);
+							$this->isWin = true;
+						}
 
-			// if(!hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
-			// 	if(placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
-			// 			if($place1->getStone() == "player"){
-			// 				$this->row =  array($x+2,$y+2,$x+1,$y+1,$x,$y,$x-1,$y-1,$x-2,$y-2);
-			// 				$this->isWin = true;
-			// 			}
+						if($place1->getStone() == "computer"){
+							$this->computerRow =  array($x+1,$y-1,$x,$y,$x-1,$y+1,$x-2,$y+2,$x-3,$y+3);
+							$this->computerWin = true;
+						}
+				}
+			}
 
-			// 			if($place1->getStone() == "computer"){
-			// 				$this->computerRow =  array($x+2,$y+2,$x+1,$y+1,$x,$y,$x-1,$y-1,$x-2,$y-2);
-			// 				$this->computerWin = true;
-			// 			}
-			// 	}
-			// }
+			$place1 = $this->at($x,$y);
+			$place2 = $this->at($x-1,$y+1);
+			$place3 = $this->at($x-2,$y+2);
+			$place4 = $this->at($x+1,$y-1);
+			$place5 = $this->at($x+2,$y-2);
 
-			// $place1 = $this->at($x,$y);
-			// $place2 = $this->at($x-1,$y-1);
-			// $place3 = $this->at($x-2,$y-2);
-			// $place4 = $this->at($x-3,$y-3);
-			// $place5 = $this->at($x-4,$y-4);
+			if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
+				if($this->placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
+						if($place1->getStone() == "player"){
+							$this->row =  array($x+2,$y-2,$x+1,$y-1,$x,$y,$x-1,$y+1,$x-2,$y+2);
+							$this->isWin = true;
+						}
 
-			// if(!hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
-			// 	if(placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
-			// 			if($place1->getStone() == "player"){
-			// 				$this->row =  array($x+3,$y+3,$x+2,$y+2,$x+1,$y+1,$x,$y,$x-1,$y-1);
-			// 				$this->isWin = true;
-			// 			}
+						if($place1->getStone() == "computer"){
+							$this->computerRow =  array($x+2,$y-2,$x+1,$y-1,$x,$y,$x-1,$y+1,$x-2,$y+2);
+							$this->computerWin = true;
+						}
+				}
+			}
 
-			// 			if($place1->getStone() == "computer"){
-			// 				$this->computerRow =  array($x+3,$y+3,$x+2,$y+2,$x+1,$y+1,$x,$y,$x-1,$y-1);
-			// 				$this->computerWin = true;
-			// 			}
-			// 	}
-			// }
+			$place1 = $this->at($x,$y);
+			$place2 = $this->at($x-1,$y+1);
+			$place3 = $this->at($x+1,$y-1);
+			$place4 = $this->at($x+2,$y-2);
+			$place5 = $this->at($x+3,$y-3);
 
-			// $place1 = $this->at($x,$y);
-			// $place2 = $this->at($x-1,$y-1);
-			// $place3 = $this->at($x-2,$y-2);
-			// $place4 = $this->at($x-3,$y-3);
-			// $place5 = $this->at($x-4,$y-4);
+			if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
+				if($this->placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
+						if($place1->getStone() == "player"){
+							$this->row =  array($x+3,$y-3,$x+2,$y-2,$x+1,$y-1,$x,$y,$x-1,$y+1);
+							$this->isWin = true;
+						}
 
-			// if(!hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
-			// 	if(placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
-			// 			if($place1->getStone() == "player"){
-			// 				$this->row =  array($x+4,$y+4,$x+3,$y+3,$x+2,$y+2,$x+1,$y+1,$x,$y);
-			// 				$this->isWin = true;
-			// 			}
+						if($place1->getStone() == "computer"){
+							$this->computerRow =  array($x+3,$y-3,$x+2,$y-2,$x+1,$y-1,$x,$y,$x-1,$y+1);
+							$this->computerWin = true;
+						}
+				}
+			}
 
-			// 			if($place1->getStone() == "computer"){
-			// 				$this->computerRow =  array($x+4,$y+4,$x+3,$y+3,$x+2,$y+2,$x+1,$y+1,$x,$y);
-			// 				$this->computerWin = true;
-			// 			}
-			// 	}
-			// }
+			$place1 = $this->at($x,$y);
+			$place2 = $this->at($x+1,$y-1);
+			$place3 = $this->at($x+2,$y-2);
+			$place4 = $this->at($x+3,$y-3);
+			$place5 = $this->at($x+4,$y-4);
+
+			if(!$this->hasNullPlaces(array($place1,$place2,$place3,$place4,$place5))){
+				if($this->placesHaveSameStone(array($place1,$place2,$place3,$place4,$place5))){
+						if($place1->getStone() == "player"){
+							$this->row =  array($x+4,$y-4,$x+3,$y-3,$x+2,$y-2,$x+1,$y-1,$x,$y);
+							$this->isWin = true;
+						}
+
+						if($place1->getStone() == "computer"){
+							$this->computerRow =  array($x+4,$y-4,$x+3,$y-3,$x+2,$y-2,$x+1,$y-1,$x,$y);
+							$this->computerWin = true;
+						}
+				}
+			}
 		}
 
 		function checkDraw($identifier){
