@@ -193,7 +193,14 @@
 			}
 		}
 	}
+	class smartStrategy{
+	      var $board;
 
+	      function smartStrategy($board){
+	      	       $this->board = $board;
+		       }
+	    	 
+	}
 	class RandomStrategy {
 		var $board;
 
@@ -220,20 +227,4 @@
 			}
 		}
 	}
-
-	function getUsedPlaces(){
-
-	}
-	class SmartStrategy{
-	
-	}
-	// $board = new Board(15);
-	// $random = new RandomStrategy($board);
-	// $random->placeStone();
-
-	
-
-	// echo $board->at(16,16)->hasStone();
-	// echo $board->at(16,16)->getStone();
-
 ?>
