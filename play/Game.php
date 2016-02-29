@@ -68,7 +68,6 @@
 			// 	))
 			// ));
 		// }
-
 		function at($x,$y){
 			foreach($this->places as &$place)
 				if($place->getX() == $x-1 && $place->getY() == $y-1)
@@ -172,6 +171,12 @@
 		}
 	}
 
+	function getUsedPlaces(){
+
+	}
+	class SmartStrategy{
+	
+	}
 	// $board = new Board(15);
 	// $random = new RandomStrategy($board);
 	// $random->placeStone();
