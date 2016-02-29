@@ -1,11 +1,17 @@
 <?php
+	include '../info/gameInfo.php';
 	include 'playChecker.php';
-	// include 'Board.php';
+	include 'Game.php';
 
-	// $board = new Board(15);
-	// $board->placeStone($x,$y);
-	// echo "I have placed a stone at $x,$y";
-	// echo "\n";
-	// echo $board->at($x,$y)->hasStone();
+	$board = new Board($size);
+	// $board->load($logs[$index]);->hasStone();
 	
+	foreach($board->places as &$place){
+		echo "(";
+		echo $place->getX();
+		echo ",";
+		echo $place->getY();
+		echo ") ";
+	}
+
 ?>

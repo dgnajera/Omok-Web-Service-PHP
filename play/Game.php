@@ -1,5 +1,6 @@
 <?php 
 	include 'Place.php'; 
+	include 'playChecker.php';
 
 	class Board {
 		var $size;
@@ -27,9 +28,7 @@
 
 		function placeStone($x,$y,$player){
 			$place = $this -> at($x,$y,$player);
-			if(is_null($place))
-				echo " NULL";
-			else echo "NOT NULL";
+			
 		}
 
 			// if($response){
@@ -140,7 +139,58 @@
 				$this->at($x,$y,$player) == $this->at($x,$y+4,$player))
 					return array($x,$y+4,$x,$y+3,$x,$y+2,$x,$y+1,$x,$y);
 
+			//check diagonal wins (top left to bottom right)
+			if($this->at($x,$y,$player) == $this->at($x-1,$y-1,$player) &&
+				$this->at($x,$y,$player) == $this->at($x-2,$y-2,$player) &&
+				$this->at($x,$y,$player) == $this->at($x-3,$y-3,$player) &&
+				$this->at($x,$y,$player) == $this->at($x-4,$y-4,$player))
+					return array($x-4,$y-4,$x-3,$y-3,$x-2,$y-2,$x-1,$y-1,$x,$y);
+			
+
+
+			if($this->at($x,$y,$player) == $this->at($x-1,$y-1,$player) &&
+				$this->at($x,$y,$player) == $this->at($x-2,$y-2,$player) &&
+				$this->at($x,$y,$player) == $this->at($x-3,$y-3,$player) &&
+				$this->at($x,$y,$player) == $this->at($x+1,$y+1,$player))
+					return array($x+1,$y+1,$x,$y,$x-1,$y-1,$x-2,$y-2,$x-3,$y-3);
+
+			if($this->at($x,$y,$player) == $this->at($x-1,$y-1,$player) &&
+				$this->at($x,$y,$player) == $this->at($x-2,$y-2,$player) &&
+				$this->at($x,$y,$player) == $this->at($x+1,$y+1,$player) &&
+				$this->at($x,$y,$player) == $this->at($x+2,$y+2,$player))
+					return array($x+2,$y+2,$x+1,$y+1,$x,$y,$x-1,$y-1,$x-2,$y-2);
+
+			if($this->at($x,$y,$player) == $this->at($x-1,$y-1,$player) &&
+				$this->at($x,$y,$player) == $this->at($x+1,$y+1,$player) &&
+				$this->at($x,$y,$player) == $this->at($x+2,$y+2,$player) &&
+				$this->at($x,$y,$player) == $this->at($x+3,$y+3,$player))
+					return array($x+3,$y+3,$x+2,$y+2,$x+1,$y+1,$x,$y,$x-1,$y-1);
+
+			if($this->at($x,$y,$player) == $this->at($x+1,$y+1,$player) &&
+				$this->at($x,$y,$player) == $this->at($x+2,$y+2,$player) &&
+				$this->at($x,$y,$player) == $this->at($x+3,$y+3,$player) &&
+				$this->at($x,$y,$player) == $this->at($x+4,$y+4,$player))
+					return array($x+4,$y+4,$x+3,$y+3,$x+2,$y+2,$x+1,$y+1,$x,$y);
+
+
 			return null;
+		}
+
+		function checkDraw(){
+			$draw = true;
+			foreach($this->places as $place)
+				if(!$place->hasStone())
+					$draw = false;
+			return $draw;
+		}
+
+		function load($log){
+			$gameStatus = json_decode($log,true);
+
+			foreach($gameStatus['playerMoves'] as $currentMove){
+				list($x,$y) = $currentMove;
+				$this->placeStone($x,$y);
+			}
 		}
 	}
 
@@ -181,17 +231,9 @@
 	// $random = new RandomStrategy($board);
 	// $random->placeStone();
 
+	
 
-	$board = new Board(15);
-	$board->placeStone(0,0,"player");
 	// echo $board->at(16,16)->hasStone();
 	// echo $board->at(16,16)->getStone();
 
-	// foreach($board->places as &$place){
-	// 	echo "(";
-	// 	echo $place->getX();
-	// 	echo ",";
-	// 	echo $place->getY();
-	// 	echo ") ";
-	// }
 ?>
