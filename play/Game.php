@@ -37,35 +37,30 @@
 			if($place->hasStone())
 				exit;
 		
-			$response = true;
 			$this->checkWin($x,$y,$player); 
 			if(empty($this->$row))
 				$this->isWin = true;
-			$this->checkDraw();
 
-			if(!$this->isWin && checkDraw())
-				$this->draw = true;
+			if(!$this->isWin && $this->checkDraw())
+				$this->isDraw = true;
 
-			if($gameStatus['strategy']=="Random")
-				exit;
+			// if($gameStatus['strategy']=="Random")
+			// 	exit;
+			
 
 			echo json_encode(array(
-				'response'=>$response,
-				'ack_move'=> json_encode(array(
-					'x'=>$x,
-					'y'=>$y,
-					'isWin'=>$this->isWin,
-					'isDraw'=>$this->isDraw,
-					'row'=>$this->row
-				)),
-				'move'=> json_encode(array(	
-					'x'=>$computerX,
-					'y'=>$computerY,
-					'isWin'=>$computerWin,
-					'isDraw'=>$computerDraw,
-					'row'=>$computerRow
-				))
+				'response'=>true,
+				'ack_move'=> json_decode(
+					'{"x":' .$x.
+					',"y":' .$y.
+					',"isWin":true' . 
+					',"isDraw":true' . 
+					',"row":[]}'
+					// ',"row":'.$this->row. '}'
+				)
+
 			));
+
 		}
 
 		function at($x,$y){
@@ -173,11 +168,10 @@
 		}
 
 		function checkDraw(){
-			// $draw = true;
 			foreach($this->places as $place)
 				if(!$place->hasStone())
-					// $draw = false;
 					return false;
+
 			return true;
 		}
 

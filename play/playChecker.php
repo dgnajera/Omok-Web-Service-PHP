@@ -17,7 +17,7 @@
 			break;
 		}
 	}
-
+	
 	//case where pid was not found or there are no game logs
 	if($index == -1 || filesize('../log/game_logs.txt') == 0){
 		echo json_encode(array('response' => false, 'reason' => "Unknown pid"));
