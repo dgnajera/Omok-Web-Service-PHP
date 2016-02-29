@@ -8,7 +8,6 @@
 	$board = new Board($size);
 	$board->load($gameStatus);
 	$board->placeStone($x,$y);
-	// $board->placeStone($x,$y,"player");
 	
 	// foreach($board->places as &$place){
 	// 	echo "(";

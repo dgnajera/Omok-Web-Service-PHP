@@ -17,7 +17,7 @@
 			break;
 		}
 	}
-	
+
 	//case where pid was not found or there are no game logs
 	if($index == -1 || filesize('../log/game_logs.txt') == 0){
 		echo json_encode(array('response' => false, 'reason' => "Unknown pid"));
@@ -37,12 +37,12 @@
 
 	list($x,$y) = $coordinates;	
 
-	if($x < 0 || $x > $size){
+	if($x < 0 || $x >= $size){
 		echo json_encode(array('response'=>false,'reason'=>"Invalid x coordinate, $x"));
 		exit;
 	}
 
-	if($y < 0 || $y > $size){
+	if($y < 0 || $y >= $size){
 		echo json_encode(array('response'=>false,'reason'=>"Invalid y coordinate, $y"));
 		exit;
 	}

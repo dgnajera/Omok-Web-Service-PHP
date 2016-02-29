@@ -4,16 +4,20 @@
 
 	class Board {
 		var $size;
+
 		var $places;
 		var $isWin;
 		var $isDraw;
 		var $row;
+
 		var $computerWin;
 		var $computerDraw;
 		var $computerRow;
-		var $strategy;
+
 		var $playerMoves;
 		var $computerMoves;
+		var $strategy;
+
 
 		//Board Constructor
 		function Board($size){
@@ -22,6 +26,9 @@
 			$this->isWin = false;
 			$this->isDraw = false;
 			$this->row = [];
+			$this->computerWin = false;
+			$this->computerDraw = false;
+			$this->computerRow = [];
 
 			for($i = 0; $i < $size; $i++)
 				for($j = 0; $j < $size; $j++)
@@ -38,34 +45,104 @@
 				exit;
 		
 			$this->checkWin($x,$y,$player); 
-			if(empty($this->$row))
+			if(!empty($this->$row))
 				$this->isWin = true;
 
-			if(!$this->isWin && $this->checkDraw())
+			if(!$this->isWin && $this->checkDraw("player"))
 				$this->isDraw = true;
 
-			// if($gameStatus['strategy']=="Random")
-			// 	exit;
+			if($this->strategy=="Random"){
+				$randomComputer = new RandomStrategy($this);
+				list($computerX,$computerY) = $randomComputer->placeStone(); 
+			}
 			
+			$serverResponse['response'] = true;
+			$serverResponse['ack_move'] = $this->generateMoveResponse($x,$y,"player");
+			$serverResponse['move'] = $this->generateMoveResponse($computerX,$computerY,"computer");
 
-			echo json_encode(array(
-				'response'=>true,
-				'ack_move'=> json_decode(
+			echo json_encode($serverResponse);
+		}
+
+		function generateMoveResponse($x,$y,$identifier){
+			if($identifier == 'player'){
+				if($this->isWin){
+					return json_decode(
+						'{"x":' .$x.
+						',"y":' .$y.
+						',"isWin":true' . 
+						',"isDraw":false' . 
+						',"row":'.$this->rowContents($this->row). 
+						'}'
+					);
+				}
+
+				else if($this->isDraw){
+					return json_decode(
+						'{"x":' .$x.
+						',"y":' .$y.
+						',"isWin":false' . 
+						',"isDraw":true' . 
+						',"row":'.$this->rowContents($this->row). 
+						'}'
+					);
+				}
+
+				else 
+					return json_decode(
+						'{"x":' .$x.
+						',"y":' .$y.
+						',"isWin":false' . 
+						',"isDraw":false' . 
+						',"row":'.$this->rowContents($this->row). 
+						'}'
+					);
+			}
+
+			//$identifier != player, so it must be $identifier == computer
+			if($this->computerWin){
+				return json_decode(
 					'{"x":' .$x.
 					',"y":' .$y.
 					',"isWin":true' . 
+					',"isDraw":false' . 
+					',"row":'.$this->rowContents($this->computerRow). 
+					'}'
+				);
+			}
+
+			else if($this->computerDraw){
+				return json_decode(
+					'{"x":' .$x.
+					',"y":' .$y.
+					',"isWin":false' . 
 					',"isDraw":true' . 
-					',"row":[]}'
-					// ',"row":'.$this->row. '}'
-				)
+					',"row":'.$this->rowContents($this->computerRow). 
+					'}'
+				);
+			}
 
-			));
+			else 
+				return json_decode(
+					'{"x":' .$x.
+					',"y":' .$y.
+					',"isWin":false' . 
+					',"isDraw":false' . 
+					',"row":'.$this->rowContents($this->computerRow). 
+					'}'
+				);
+		}
 
+		function rowContents($row){
+			$rowContents = '[';
+			foreach($row as $currentCoordinate)
+				$rowContents .= $currentCoordinate;
+			$rowContents .= ']';
+			return $rowContents;
 		}
 
 		function at($x,$y){
 			foreach($this->places as &$place)
-				if($place->getX() == $x-1 && $place->getY() == $y-1)
+				if($place->getX() == $x && $place->getY() == $y)
 					return $place;
 			return null;
 		}
@@ -167,10 +244,16 @@
 					$this->row =  array($x+4,$y+4,$x+3,$y+3,$x+2,$y+2,$x+1,$y+1,$x,$y);
 		}
 
-		function checkDraw(){
+		function checkDraw($identifier){
 			foreach($this->places as $place)
 				if(!$place->hasStone())
 					return false;
+
+			if($identifier == "player")
+				$this->isDraw = true;
+
+			if($identifier == "computer")
+				$this->computerDraw = true;
 
 			return true;
 		}
@@ -204,22 +287,18 @@
 		}
 
 		function placeStone(){
-			$loop = true;
-			while($loop){
+			while(true){
 				$randomX = rand(0,$this->board->getSize()-1);
 				$randomY = rand(0,$this->board->getSize()-1);
-
 				if(!$this->board->at($randomX,$randomY)->hasStone()){
-					$this->board->placeStone($randomX,$randomY,"computer");
-					$loop = false;
-					$this->board->checkWin($randomX,$randomY);
-					$this->board->checkDraw($randomX,$randomY);
-
-					return json_encode(array(
-
-					));
+					$this->board->at($randomX,$randomY)->placeStone("computer");
+					$this->board->computerWin = $this->board->checkWin($randomX,$randomY,"computer");
+					$this->board->computerDraw = $this->board->checkDraw($randomX,$randomY,"computer");
+					return array($randomX,$randomY);
 				}
 			}
 		}
 	}
 ?>
+
+
