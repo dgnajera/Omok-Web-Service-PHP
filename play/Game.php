@@ -11,7 +11,9 @@
 		var $computerWin;
 		var $computerDraw;
 		var $computerRow;
-		var $gameStatus;
+		var $strategy;
+		var $playerMoves;
+		var $computerMoves;
 
 		//Board Constructor
 		function Board($size){
@@ -36,9 +38,8 @@
 				exit;
 		
 			$response = true;
-			$this->checkWin(); 
-
-			if(!empty($this->$row))
+			$this->checkWin($x,$y,$player); 
+			if(empty($this->$row))
 				$this->isWin = true;
 			$this->checkDraw();
 
@@ -46,7 +47,8 @@
 				$this->draw = true;
 
 			if($gameStatus['strategy']=="Random")
-				
+				exit;
+
 			echo json_encode(array(
 				'response'=>$response,
 				'ack_move'=> json_encode(array(
@@ -64,40 +66,8 @@
 					'row'=>$computerRow
 				))
 			));
-			// 	checkDraw(); //write this
-
-			// 	if($isWin){
-			// 		echo json_encode(array(
-			// 			['response']=>$response,
-			// 			['ack_move']=>json_encode(array(
-			// 				['x']=>$x,
-			// 				['y']=>$y,
-			// 				['isWin']=>$isWin,
-			// 				['isDraw']=>$isDraw,
-			// 				['row']=>$row
-			// 			))
-			// 		));
-			// 	}
-
-			// 	if(!$isWin || !$isDraw){
-			// 		//computer move
-			// 	}
-			// }
-			// echo json_encode(array(
-			// 	['response']=>$response,
-			// 	['ack_move']=>json_encode(array(
-			// 		['x']=>$x,
-			// 		['y']=>$y,
-			// 		['isWin']=>$isWin,
-			// 		['isDraw']=>$isDraw,
-			// 		['row']=>$row
-			// 	)),
-			// 	['move']=>json_encode(array(
-			// 		['x']=>$AIx,
-			// 		['y']=>$
-			// 	))
-			// ));
 		}
+
 		function at($x,$y){
 			foreach($this->places as &$place)
 				if($place->getX() == $x-1 && $place->getY() == $y-1)
@@ -177,8 +147,6 @@
 				$this->at($x,$y,$player) == $this->at($x-4,$y-4,$player))
 					$this->row =  array($x-4,$y-4,$x-3,$y-3,$x-2,$y-2,$x-1,$y-1,$x,$y);
 			
-
-
 			if($this->at($x,$y,$player) == $this->at($x-1,$y-1,$player) &&
 				$this->at($x,$y,$player) == $this->at($x-2,$y-2,$player) &&
 				$this->at($x,$y,$player) == $this->at($x-3,$y-3,$player) &&
@@ -202,7 +170,6 @@
 				$this->at($x,$y,$player) == $this->at($x+3,$y+3,$player) &&
 				$this->at($x,$y,$player) == $this->at($x+4,$y+4,$player))
 					$this->row =  array($x+4,$y+4,$x+3,$y+3,$x+2,$y+2,$x+1,$y+1,$x,$y);
-
 		}
 
 		function checkDraw(){
@@ -213,23 +180,27 @@
 			return $draw;
 		}
 
-		function load($log){
-			$this->$gameStatus = json_decode($log,true);
+		function load($gameStatus){
+			$this->strategy = $gameStatus['strategy'];
+			$this->playerMoves = $gameStatus['playerMoves'];
+			$this->computerMoves = $gameStatus['computerMoves'];
 
-			foreach($gameStatus['playerMoves'] as $currentMove){
-				list($x,$y) = $currentMove;
-				$this->placeStone($x,$y);
+			if(!empty($gameStatus['playerMoves'])){
+				foreach($gameStatus['playerMoves'] as $currentMove){
+					list($x,$y) = $currentMove;
+					$this->placeStone($x,$y);
+				}
+			}
+
+			if(!empty($gameStatus['computerMoves'])){
+				foreach($gameStatus['computerMoves'] as $currentMove){
+					list($x,$y) = $currentMove;
+					$this->placeStone($x,$y);
+				}
 			}
 		}
 	}
-	class smartStrategy{
-	      var $board;
 
-	      function smartStrategy($board){
-	      	       $this->board = $board;
-		       }
-	    	 
-	}
 	class RandomStrategy {
 		var $board;
 
