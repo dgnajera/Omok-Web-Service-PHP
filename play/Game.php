@@ -109,6 +109,37 @@
 				$this->at($x,$y,$player) == $this->at($x+4,$y,$player))
 					return array($x+4,$y,$x+3,$y,$x+2,$y,$x+1,$y,$x,$y);
 
+			//check vertical wins
+			if($this->at($x,$y,$player) == $this->at($x,$y-1,$player) &&
+				$this->at($x,$y,$player) == $this->at($x,$y-2,$player) &&
+				$this->at($x,$y,$player) == $this->at($x,$y-3,$player) &&
+				$this->at($x,$y,$player) == $this->at($x,$y-4,$player))
+					return array($x,$y-4,$x,$y-3,$x,$y-2,$x,$y-1,$x,$y);
+			
+
+			if($this->at($x,$y,$player) == $this->at($x,$y-1,$player) &&
+				$this->at($x,$y,$player) == $this->at($x,$y-2,$player) &&
+				$this->at($x,$y,$player) == $this->at($x,$y-3,$player) &&
+				$this->at($x,$y,$player) == $this->at($x,$y+1,$player))
+					return array($x,$y+1,$x,$y,$x,$y-1,$x,$y-2,$x,$y-3);
+
+			if($this->at($x,$y,$player) == $this->at($x,$y-1,$player) &&
+				$this->at($x,$y,$player) == $this->at($x,$y-2,$player) &&
+				$this->at($x,$y,$player) == $this->at($x,$y+1,$player) &&
+				$this->at($x,$y,$player) == $this->at($x,$y+2,$player))
+					return array($x,$y+2,$x,$y+1,$x,$y,$x,$y-1,$x,$y-2);
+
+			if($this->at($x,$y,$player) == $this->at($x,$y-1,$player) &&
+				$this->at($x,$y,$player) == $this->at($x,$y+1,$player) &&
+				$this->at($x,$y,$player) == $this->at($x,$y+2,$player) &&
+				$this->at($x,$y,$player) == $this->at($x,$y+3,$player))
+					return array($x,$y+3,$x,$y+2,$x,$y+1,$x,$y,$x,$y-1);
+
+			if($this->at($x,$y,$player) == $this->at($x,$y+1,$player) &&
+				$this->at($x,$y,$player) == $this->at($x,$y+2,$player) &&
+				$this->at($x,$y,$player) == $this->at($x,$y+3,$player) &&
+				$this->at($x,$y,$player) == $this->at($x,$y+4,$player))
+					return array($x,$y+4,$x,$y+3,$x,$y+2,$x,$y+1,$x,$y);
 
 			return null;
 
