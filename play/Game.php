@@ -45,17 +45,18 @@
 
 		function placeStone($x,$y,$player){
 			$place = $this -> at($x,$y);
+
+			//check if place has stone
 			if($place->hasStone())
 				exit;
 			
+			//place the stone
+			$place->placeStone("player");
+
+			//update the list of player moves with the new move [$x,$y]
 			array_push($this->gameStatus['playerMoves'],[(int)$x,(int)$y]);			
 
-			$this->logs[$this->index] = json_encode($this->gameStatus);
-			$updatedLogs = implode('|',$this->logs);
-
-			file_put_contents('../log/game_logs.txt', $updatedLogs);
-
-			$this->checkWin($x,$y,$player); 
+			$this->($x,$y,$player); 
 			if(!empty($this->$row))
 				$this->isWin = true;
 
@@ -65,13 +66,20 @@
 			if($this->strategy=="Random"){
 				$randomComputer = new RandomStrategy($this);
 				list($computerX,$computerY) = $randomComputer->placeStone(); 
+				array_push($this->gameStatus['computerMoves'],[(int)$computerX,(int)$computerY]);			
 			}
 			
+			$this->logs[$this->index] = json_encode($this->gameStatus);
+			$updatedLogs = implode('|',$this->logs);
+
+			echo $updatedLogs;
+			file_put_contents('../log/game_logs.txt', $updatedLogs);
+
 			$serverResponse['response'] = true;
 			$serverResponse['ack_move'] = $this->generateMoveResponse($x,$y,"player");
 			$serverResponse['move'] = $this->generateMoveResponse($computerX,$computerY,"computer");
 
-			echo json_encode($serverResponse);
+			// echo json_encode($serverResponse);
 		}
 
 		function generateMoveResponse($x,$y,$identifier){
@@ -152,10 +160,15 @@
 		}
 
 		function at($x,$y){
-			foreach($this->places as &$place)
-				if($place->getX() == $x && $place->getY() == $y)
-					return $place;
-			return null;
+			$place = null;
+
+			foreach($this->places as $p)
+				if($p->getX() == $x && $p->getY() == $y){
+					$place = $p;
+					break;
+				}
+			
+			return $place;
 		}
 
 		function checkWin($x,$y,$player){
@@ -280,14 +293,14 @@
 			if(!empty($this->gameStatus['playerMoves'])){
 				foreach($this->gameStatus['playerMoves'] as $currentMove){
 					list($x,$y) = $currentMove;
-					$this->placeStone($x,$y);
+					$this->at($x,$y)->placeStone("player");
 				}
 			}
 
 			if(!empty($this->gameStatus['computerMoves'])){
 				foreach($this->gameStatus['computerMoves'] as $currentMove){
 					list($x,$y) = $currentMove;
-					$this->placeStone($x,$y);
+					$this->at($x,$y)->placeStone("player");
 				}
 			}
 		}
