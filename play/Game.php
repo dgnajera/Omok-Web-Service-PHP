@@ -43,7 +43,7 @@
 				$this->isWin = true;
 			$this->checkDraw();
 
-			if(!$this->isWin && $this->isDraw)
+			if(!$this->isWin && checkDraw())
 				$this->draw = true;
 
 			if($gameStatus['strategy']=="Random")
@@ -173,11 +173,12 @@
 		}
 
 		function checkDraw(){
-			$draw = true;
+			// $draw = true;
 			foreach($this->places as $place)
 				if(!$place->hasStone())
-					$draw = false;
-			return $draw;
+					// $draw = false;
+					return false;
+			return true;
 		}
 
 		function load($gameStatus){
