@@ -1,2 +1,3 @@
-# omok
-Programming Languages Omok Project
+# Omok Game Web Service (PHP)
+#####Course: CS 3360 - Design and Implementation of Programming Languages
+The purpose of this assignment was to understand the concepts of web scripting languages and have a hands-on experience with web scripting by writing a small web service code in PHP. We were to write a web service in PHP for playing Omok games. Omok is a two-player game in which two players take turns placing stones on a 15x15 board and try and win by connecting 5 either horizontally, vertically, or diagonally. The web service was to work with a provided Java client (included in repository), and be able to support multiple clients concurrently, each playing against a server-provided Random strategy. The web service was to handle the logic of the game and determine the outcome and communicate to the Java client by JSON strings. 
